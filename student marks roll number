@@ -1,0 +1,120 @@
+student marks roll number#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define MAX_STUDENTS 100
+#define MAX_NAME_LENGTH 100
+
+// Structure to store student details
+typedef struct {
+    char name[MAX_NAME_LENGTH];
+    int rollNumber;
+    float marks;
+} Student;
+
+// Function prototypes
+void addStudent(Student students[], int *studentCount);
+void viewStudents(Student students[], int studentCount);
+int searchStudentByRollNumber(Student students[], int studentCount, int rollNumber);
+void displayMenu();
+
+int main() {
+    Student students[MAX_STUDENTS];
+    int studentCount = 0;
+    int choice, rollNumber;
+    
+    while (1) {
+        displayMenu();
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+        getchar();  // to consume the newline character after scanf
+
+        switch (choice) {
+            case 1:
+                addStudent(students, &studentCount);
+                break;
+            case 2:
+                viewStudents(students, studentCount);
+                break;
+            case 3:
+                printf("Enter the roll number to search: ");
+                scanf("%d", &rollNumber);
+                getchar();  // consume newline character
+                if (searchStudentByRollNumber(students, studentCount, rollNumber) != -1) {
+                    printf("Student found with roll number %d.\n", rollNumber);
+                } else {
+                    printf("Student with roll number %d not found.\n", rollNumber);
+                }
+                break;
+            case 4:
+                printf("Exiting the program.\n");
+                exit(0);
+            default:
+                printf("Invalid choice! Please try again.\n");
+        }
+    }
+
+    return 0;
+}
+
+// Function to display menu
+void displayMenu() {
+    printf("\n----- Student Information System -----\n");
+    printf("1. Add a new student\n");
+    printf("2. View all students\n");
+    printf("3. Search for a student by roll number\n");
+    printf("4. Exit\n");
+}
+
+// Function to add a new student
+void addStudent(Student students[], int *studentCount) {
+    if (*studentCount >= MAX_STUDENTS) {
+        printf("Error: Cannot add more students. Storage is full.\n");
+        return;
+    }
+
+    Student newStudent;
+    printf("\nEnter student name: ");
+    fgets(newStudent.name, MAX_NAME_LENGTH, stdin);
+    newStudent.name[strcspn(newStudent.name, "\n")] = 0;  // Remove the newline character
+
+    printf("Enter student roll number: ");
+    scanf("%d", &newStudent.rollNumber);
+
+    printf("Enter student marks: ");
+    scanf("%f", &newStudent.marks);
+    getchar();  // Consume the newline character
+
+    students[*studentCount] = newStudent;
+    (*studentCount)++;
+    printf("Student added successfully!\n");
+}
+
+// Function to view all students
+void viewStudents(Student students[], int studentCount) {
+    if (studentCount == 0) {
+        printf("No students available.\n");
+        return;
+    }
+
+    printf("\n----- List of Students -----\n");
+    for (int i = 0; i < studentCount; i++) {
+        printf("Name: %s\n", students[i].name);
+        printf("Roll Number: %d\n", students[i].rollNumber);
+        printf("Marks: %.2f\n\n", students[i].marks);
+    }
+}
+
+// Function to search for a student by roll number
+int searchStudentByRollNumber(Student students[], int studentCount, int rollNumber) {
+    for (int i = 0; i < studentCount; i++) {
+        if (students[i].rollNumber == rollNumber) {
+            printf("\nStudent found:\n");
+            printf("Name: %s\n", students[i].name);
+            printf("Roll Number: %d\n", students[i].rollNumber);
+            printf("Marks: %.2f\n", students[i].marks);
+            return i;  // Student found
+        }
+    }
+    return -1;  // Student not found
+}
