@@ -1,0 +1,149 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define MAX_BOOKS 100
+#define MAX_TITLE_LENGTH 100
+#define MAX_AUTHOR_LENGTH 100
+
+// Structure to store book details
+typedef struct {
+    char title[MAX_TITLE_LENGTH];
+    char author[MAX_AUTHOR_LENGTH];
+    int year;
+    float price;
+} Book;
+
+// Function prototypes
+void addBook(Book books[], int *bookCount);
+void viewBooks(Book books[], int bookCount);
+int searchBookByTitle(Book books[], int bookCount, const char *title);
+void deleteBookByTitle(Book books[], int *bookCount, const char *title);
+void displayMenu();
+
+int main() {
+    Book books[MAX_BOOKS];
+    int bookCount = 0;
+    int choice;
+    char title[MAX_TITLE_LENGTH];
+    
+    while (1) {
+        displayMenu();
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+        getchar();  // to consume the newline character after scanf
+
+        switch (choice) {
+            case 1:
+                addBook(books, &bookCount);
+                break;
+            case 2:
+                viewBooks(books, bookCount);
+                break;
+            case 3:
+                printf("Enter the title of the book to search: ");
+                fgets(title, MAX_TITLE_LENGTH, stdin);
+                title[strcspn(title, "\n")] = 0;  // Remove the newline character
+                if (searchBookByTitle(books, bookCount, title) != -1) {
+                    printf("Book found: %s\n", title);
+                } else {
+                    printf("Book not found.\n");
+                }
+                break;
+            case 4:
+                printf("Enter the title of the book to delete: ");
+                fgets(title, MAX_TITLE_LENGTH, stdin);
+                title[strcspn(title, "\n")] = 0;  // Remove the newline character
+                deleteBookByTitle(books, &bookCount, title);
+                break;
+            case 5:
+                printf("Exiting the program.\n");
+                exit(0);
+            default:
+                printf("Invalid choice! Please try again.\n");
+        }
+    }
+
+    return 0;
+}
+
+// Function to display menu
+void displayMenu() {
+    printf("\n----- Book Management System -----\n");
+    printf("1. Add a new book\n");
+    printf("2. View all books\n");
+    printf("3. Search for a book by title\n");
+    printf("4. Delete a book by title\n");
+    printf("5. Exit\n");
+}
+
+// Function to add a new book
+void addBook(Book books[], int *bookCount) {
+    if (*bookCount >= MAX_BOOKS) {
+        printf("Error: Cannot add more books. Storage is full.\n");
+        return;
+    }
+
+    Book newBook;
+    printf("\nEnter the book title: ");
+    fgets(newBook.title, MAX_TITLE_LENGTH, stdin);
+    newBook.title[strcspn(newBook.title, "\n")] = 0;  // Remove the newline character
+
+    printf("Enter the author: ");
+    fgets(newBook.author, MAX_AUTHOR_LENGTH, stdin);
+    newBook.author[strcspn(newBook.author, "\n")] = 0;  // Remove the newline character
+
+    printf("Enter the year of publication: ");
+    scanf("%d", &newBook.year);
+
+    printf("Enter the price: ");
+    scanf("%f", &newBook.price);
+    getchar();  // Consume the newline character
+
+    books[*bookCount] = newBook;
+    (*bookCount)++;
+    printf("Book added successfully!\n");
+}
+
+// Function to view all books
+void viewBooks(Book books[], int bookCount) {
+    if (bookCount == 0) {
+        printf("No books available.\n");
+        return;
+    }
+
+    printf("\n----- List of Books -----\n");
+    for (int i = 0; i < bookCount; i++) {
+        printf("Title: %s\n", books[i].title);
+        printf("Author: %s\n", books[i].author);
+        printf("Year: %d\n", books[i].year);
+        printf("Price: %.2f\n\n", books[i].price);
+    }
+}
+
+// Function to search a book by title
+int searchBookByTitle(Book books[], int bookCount, const char *title) {
+    for (int i = 0; i < bookCount; i++) {
+        if (strcmp(books[i].title, title) == 0) {
+            return i;  // Book found
+        }
+    }
+    return -1;  // Book not found
+}
+
+// Function to delete a book by title
+void deleteBookByTitle(Book books[], int *bookCount, const char *title) {
+    int index = searchBookByTitle(books, *bookCount, title);
+    if (index == -1) {
+        printf("Book not found.\n");
+        return;
+    }
+
+    // Shift all books after the deleted book to the left
+    for (int i = index; i < *bookCount - 1; i++) {
+        books[i] = books[i + 1];
+    }
+
+    (*bookCount)--;  // Decrease the book count
+    printf("Book deleted successfully!\n");
+}
